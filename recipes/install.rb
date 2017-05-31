@@ -1,3 +1,4 @@
+setup_aws()
 
 group node['ndb']['group'] do
  action :create
