@@ -1,7 +1,7 @@
 
 # Stop all the service and remove all services
 # TODO - should rename 'ndbd' as 'ndbmtd'. pkill wont work here fo it
-daemons = %w{ndb_mgmd ndbdmtd mysqld memcached}
+daemons = %w{ndb_mgmd ndbmtd mysqld memcached}
 daemons.each { |d| 
 
   bash 'kill_running_service_#{d}' do
@@ -27,7 +27,26 @@ daemons.each { |d|
     action :delete
     ignore_failure true
   end
+  file "/etc/systemd/system/#{d}.service" do
+    action :delete
+    ignore_failure true
+  end
+  directory "/etc/systemd/system/#{d}.service.d" do
+    recursive true
+    action :delete
+    ignore_failure true
+  end
 }
+
+  bash 'systemd_reset_failed' do
+    user "root"
+    ignore_failure true
+    code <<-EOF
+      systemctl daemon-reload
+      systemctl reset-failed
+    EOF
+  end
+
 
 directory node.ndb.mysql_server_dir do
   recursive true
@@ -94,8 +113,7 @@ end
 
 
 
-package_url = node.ndb.package_url
-base_package_filename =  File.basename(node.ndb.package_url)
+base_package_filename = "mysql-cluster-gpl-#{node['ndb']['versionStr']}-linux-glibc#{node['ndb']['glib_version']}-x86_64.tar.gz"
 cached_package_filename = "#{Chef::Config[:file_cache_path]}/#{base_package_filename}"
 
 
