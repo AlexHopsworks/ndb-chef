@@ -63,7 +63,7 @@ if node.ndb.systemd != "true"
   template "/etc/init.d/#{service_name}" do
     source "#{service_name}.erb"
     owner node.ndb.user
-    group node.ndb.user
+    group node.ndb.group
     mode 0755
     variables({
                 :ndb_dir => node.ndb.base_dir,
@@ -94,7 +94,7 @@ else #systemd
   template systemd_script do
     source "#{service_name}.service.erb"
     owner node.ndb.user
-    group node.ndb.user
+    group node.ndb.group
     mode 0755
     cookbook 'ndb'
     variables({
@@ -107,11 +107,9 @@ else #systemd
     notifies :enable, "service[#{service_name}]"
   end
 
-  ndb_start "reload_memcached" do
+  kagent_config "#{service_name}" do
     action :systemd_reload
-    notifies :restart, "service[#{service_name}]"
   end
-
 end
 
 if node.kagent.enabled == "true"

@@ -107,12 +107,15 @@ template systemd_script do
 if node.services.enabled == "true"
     notifies :enable, resources(:service => service_name)
 end
-    notifies :restart, "service[#{service_name}]", :immediately
+#    notifies :restart, "service[#{service_name}]", :immediately
 end
 
-ndb_start "reload_ndbd" do
-  action :systemd_reload
-end
+#
+# Note: This will not do a rolling restart - it will bring down the DB.
+#
+  kagent_config "#{service_name}" do
+    action :systemd_reload
+  end
 
 end
 

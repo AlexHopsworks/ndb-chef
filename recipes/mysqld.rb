@@ -132,10 +132,11 @@ else # sytemd is true
     action :nothing
   end
 
-  ndb_start "reload_mysqld" do
+  ndb_start "mysqld" do
     action :systemd_reload
   end
 
+  
 end
 
 mysql_ip = my_ip
@@ -205,8 +206,18 @@ template grants_path do
   variables({
               :my_ip => my_ip
             })
-  notifies :install_grants, "ndb_mysql_basic[install]", :immediately
 end
+
+ndb_mysql_basic "create_users_grants" do
+  action :install_grants
+end
+
+# Dont leave the username/passwords to mysql lying around in file in the cache
+file "#{Chef::Config.file_cache_path}/grants.sql" do
+  owner "root"
+  action :delete
+end
+
 
 
 if node.ndb.enabled == "true"
@@ -239,4 +250,3 @@ end
 ndb_start "mysqld" do
   action :start_if_not_running
 end
-
