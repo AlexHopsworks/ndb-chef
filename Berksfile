@@ -5,5 +5,5 @@ metadata
 cookbook 'kagent', github: "AlexHopsworks/kagent-chef", branch: "vdcurrent"
 cookbook 'conda', github: "AlexHopsworks/conda-chef", branch: "vdcurrent"
 
-cookbook 'ulimit', github: "AlexHopsworks/chef-ulimit", branch: "master"
+cookbook 'ulimit', github: "AlexHopsworks/chef-ulimit", branch: "vdcurrent"
 
